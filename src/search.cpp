@@ -1319,7 +1319,7 @@ moves_loop:  // When in check, search starts here
             r -= 2179;
           
         if (!capture && !opponentWorsening && ss->statScore >= 0)
-            r -= reduction;
+            r -= Stockfish::reduction;
 
         if (capture)
             ss->statScore = 873 * int(PieceValue[pos.captured_piece()]) / 128
