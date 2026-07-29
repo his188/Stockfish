@@ -26,7 +26,6 @@
 #include <iostream>
 #include <memory>
 #include <sstream>
-#include <tune.h>
 #include "misc.h"
 #include "nnue/network.h"
 #include "nnue/nnue_misc.h"
