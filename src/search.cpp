@@ -51,8 +51,6 @@
 #include "ucioption.h"
 
 namespace Stockfish {
-int reduction = 256;
-TUNE(reduction);
 static constexpr std::array<int, 16> lmrDivisor = {3637, 2787, 2761, 2939, 3171, 3347, 3147, 2762,
                                                    2772, 3106, 3107, 3060, 3112, 2991, 3090, 3542};
 
@@ -1318,8 +1316,6 @@ moves_loop:  // When in check, search starts here
         else if (move == ttData.move)
             r -= 2179;
           
-        if (!capture && !opponentWorsening && ss->statScore >= 0)
-            r -= Stockfish::reduction;
 
         if (capture)
             ss->statScore = 873 * int(PieceValue[pos.captured_piece()]) / 128
@@ -1330,6 +1326,8 @@ moves_loop:  // When in check, search starts here
                + 1093 * (*contHist[1])[movedPiece][move.to_sq()])
               / 1024;
 
+        if (!capture && !opponentWorsening && ss->statScore >= 0)
+            r -= 256;
         // Decrease/increase reduction for moves with a good/bad history
         r -= ss->statScore * 439 / 4096;
 
