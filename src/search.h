@@ -390,7 +390,6 @@ class Worker {
     Depth     rootDepth;
     Value     rootDelta;
 
-    rootCorrectionUncertainty = 0;
 
     PVMoves lastIterationIdxPV;
 
