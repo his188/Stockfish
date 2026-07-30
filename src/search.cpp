@@ -1327,7 +1327,7 @@ moves_loop:  // When in check, search starts here
               / 1024;
 
         if (!capture && !opponentWorsening && ss->statScore >= 0)
-            r -= 256;
+            r -= 128;
         // Decrease/increase reduction for moves with a good/bad history
         r -= ss->statScore * 439 / 4096;
 
