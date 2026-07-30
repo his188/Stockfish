@@ -54,6 +54,7 @@ namespace Stockfish {
 static constexpr std::array<int, 16> lmrDivisor = {3637, 2787, 2761, 2939, 3171, 3347, 3147, 2762,
                                                    2772, 3106, 3107, 3060, 3112, 2991, 3090, 3542};
 
+
 namespace TB = Tablebases;
 
 void syzygy_extend_pv(const OptionsMap&            options,
@@ -98,6 +99,17 @@ int correction_value(const Worker& w, const Position& pos, const Stack* const ss
     return 15341 * pcv + 10569 * micv + 12906 * (wnpcv + bnpcv) + cntcv;
 }
 
+
+int correction_uncertainty(const int correctionValue) {
+
+    constexpr int FullUncertaintyCp = 200;
+    const int correctionCp = std::abs(correctionValue) / 131072;
+
+    return std::clamp(
+        correctionCp * 256 / FullUncertaintyCp,
+        0,
+        256);
+}
 // Add correctionHistory value to raw staticEval and guarantee evaluation
 // does not hit the tablebase range.
 Value to_corrected_static_eval(const Value v, const int cv) {
@@ -1326,8 +1338,6 @@ moves_loop:  // When in check, search starts here
                + 1093 * (*contHist[1])[movedPiece][move.to_sq()])
               / 1024;
 
-        if (!capture && !opponentWorsening && ss->statScore >= 0)
-            r -= 256;
         // Decrease/increase reduction for moves with a good/bad history
         r -= ss->statScore * 439 / 4096;
 
