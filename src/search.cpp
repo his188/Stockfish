@@ -808,6 +808,12 @@ Value Search::Worker::search(
 
     const auto correctionValue = correction_value(*this, pos, ss);
 
+    const int correctionUncertainty =
+        correction_uncertainty(correctionValue);
+
+    if constexpr (rootNode)
+       rootCorrectionUncertainty = correctionUncertainty;
+
     // Step 4. Transposition table lookup
     excludedMove                   = ss->excludedMove;
     posKey                         = pos.key();
