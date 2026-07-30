@@ -282,6 +282,8 @@ bool Search::Worker::iterative_deepening() {
 
     SearchManager* mainThread = (is_mainthread() ? main_manager() : nullptr);
 
+    rootCorrectionUncertainty = 0;
+  
     PVMoves pv;
 
     PVMoves lastBestMovePV;
@@ -599,8 +601,36 @@ bool Search::Worker::iterative_deepening() {
             double highBestMoveEffort = std::clamp(
               interpolate(i64(nodesEffort), i64(75800), i64(104510), 0.969, 0.714), 0.693, 0.838);
 
-            double totalTime = mainThread->tm.optimum() * fallingEval * reduction
-                             * bestMoveInstability * highBestMoveEffort;
+            const double rootUncertainty =
+              rootCorrectionUncertainty / 256.0;
+            
+            const double moveInstability =
+                std::clamp(
+                    totBestMoveChanges / double(std::max<usize>(1, threads.size())),
+                    0.0,
+                    1.0);
+            
+            const double evalInstability =
+                std::clamp(
+                    std::abs(double(mainThread->iterValue[iterIdx] - bestValue)) / 100.0,
+                    0.0,
+                    1.0);
+            
+            const double activeUncertainty =
+                rootUncertainty
+                * (0.35 + 0.35 * moveInstability + 0.30 * evalInstability);
+            
+            constexpr double MaxUncertaintyTimeBonus = 0.06;
+            
+            const double uncertaintyTimeFactor =
+                1.0 + MaxUncertaintyTimeBonus * activeUncertainty;
+
+            double totalTime = mainThread->tm.optimum()
+                 * fallingEval
+                 * reduction
+                 * bestMoveInstability
+                 * highBestMoveEffort
+                 * uncertaintyTimeFactor;
 
             if (rootMoves.size() == 1)
                 // Cap used time to 0.5s for a better viewer experience
