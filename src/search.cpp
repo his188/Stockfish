@@ -1351,6 +1351,15 @@ moves_loop:  // When in check, search starts here
         if (allNode)
             r += r * 276 / (256 * depth + 268);
 
+        // Flatten LMR slightly when correction uncertainty is high
+        if (!PvNode && !capture && moveCount > 3 && depth >= 5 && r >= 3 * 1024)
+          {
+              const int refundScore =
+                correctionUncertainty * std::min(r / 1024 - 1, 4);
+
+              if (refundScore >= 768)
+                  r -= 1024;
+          }
         // Step 17. Late moves reduction / extension (LMR)
         if (depth >= 2 && moveCount > 1)
         {
