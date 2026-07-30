@@ -346,6 +346,8 @@ class Worker {
    private:
     bool iterative_deepening();
 
+    rootCorrectionUncertainty = 0;
+
     void do_move(Position& pos, const Move move, StateInfo& st, Stack* const ss);
     void
     do_move(Position& pos, const Move move, StateInfo& st, const bool givesCheck, Stack* const ss);
@@ -387,6 +389,8 @@ class Worker {
     RootMoves rootMoves;
     Depth     rootDepth;
     Value     rootDelta;
+
+    int rootCorrectionUncertainty = 0;
 
     PVMoves lastIterationIdxPV;
 
